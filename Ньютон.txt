@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+namespace Interpolation
+{
+    class Program
+    {
+        static double Diff(double Diff1, double Diff2, double x1, double x2)
+        {
+            return (Diff2 - Diff1) / (x2 - x1);
+        }
+     static void Main(string[] args)
+        {
+            int n = int.Parse(Console.ReadLine());
+            List<double> XList = new List<double>();
+            List<double> YList = new List<double>();
+            List<double> Differences = new List<double>();
+            List<double> formul = new List<double>();
+            for (int i = 0;i<=n; i++)
+            {
+                XList.Add(i);
+                YList.Add(i *i);
+                Differences.Add(i * i);
+            }
+            formul.Add(YList[0]);
+            Console.Write("x(k): ");
+            foreach (double item in XList)
+            {
+                Console.Write("{0} ", item);
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.Write("y(k): ");
+            foreach (double item in YList)
+            {
+                Console.Write("{0} ", item);
+            }
+            Console.WriteLine();
+            Console.WriteLine("Таблица разделенных разностей:");
+            for (int i = 0;i <YList.Count; i++)
+            {
+                Console.Write("f({0})|{1} ", i, YList[i]);
+            }
+            Console.WriteLine();
+            List<double> DifferencesTwo = new List<double>();
+            double diff1;
+            double diff2;
+            double x1;
+            double x2;
+
+            for (int i = 1;i<n;i++)
+            {
+                for (int j = 0; j < Differences.Count-1; j++)
+                {
+                    diff1 = Differences[j];
+                    diff2 = Differences[j + 1];
+                    x1 = XList[j];
+                    x2 = XList[j + i];
+                    Console.Write("f({0}.{1})|{2} ",j, j+i, Diff(diff1, diff2, x1, x2));
+                    DifferencesTwo.Add(Diff(diff1, diff2, x1, x2));
+                    if (j == 0)
+                    {
+                        formul.Add(Diff(diff1, diff2, x1, x2));
+                    }
+                }
+                Differences.Clear();
+                foreach (double item in DifferencesTwo)
+                {
+                    Differences.Add(item);
+                }
+                DifferencesTwo.Clear();
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+            Console.WriteLine("Разделенные разности для формы Ньютона:");
+            foreach (double item in formul)
+            {
+                Console.Write("{0} ", item);
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+            double ResultN = 0;
+            int t = 0;
+            Console.WriteLine("Узел интерполяции:");
+            double Node = double.Parse(Console.ReadLine());
+           for (int i = 0; i<formul.Count;i++)
+            {
+                int k = 0;
+                double p = formul[i];
+                while (k <t)
+                {
+                    p *= (Node - XList[k]);
+                    k++;
+                }
+                t++;
+                ResultN += p;
+            }
+            Console.WriteLine("Интерполянта: {0} ", ResultN);
+            Console.ReadLine();
+        }
+    }
+}
