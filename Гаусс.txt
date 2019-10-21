@@ -1,0 +1,154 @@
+using System;
+using System.Collections.Generic;
+namespace Interpolation
+{
+    class Program
+    {
+        static void SwitchOfTheMAin (int index, double [,] matrix, double []b)
+        {
+            Console.WriteLine("Мы встретили ноль!");
+            double mainElement = matrix[index, index];
+            int in2 = index;
+            for (int i = index+1; i<matrix.GetLength(0);i++)
+            {
+                if (Math.Abs(matrix[i,index])>mainElement) {
+                    mainElement = matrix[i, index];
+                    in2 = i; 
+                }
+            }
+            if (mainElement != 0)
+            {
+                double [] temp = new double[matrix.GetLength(1)];
+                double tmp = b[index];
+                b[index] = b[in2];
+                b[in2] = tmp;
+                for (int j = 0; j<matrix.GetLength(1);j++) { 
+                    temp[j] = matrix[index, j];
+                    matrix[index, j] = matrix[in2, j];
+                    matrix[in2, j] = temp[j];
+                }
+            } else
+            {
+                for (int j = index + 1; j < matrix.GetLength(1); j++)
+                {
+                    if (Math.Abs(matrix[index, j]) > mainElement)
+                    {
+                        mainElement = matrix[j, index];
+                        in2 = j;
+                    }
+                }
+                if (mainElement !=0)
+                {
+                    double[] temp = new double[matrix.GetLength(0)];
+                    for (int i = 0; i < matrix.GetLength(0); i++)
+                    {
+                        temp[i] = matrix[i, index];
+                        matrix[i, index] = matrix[i, in2];
+                        matrix[i, in2] = temp[i];
+                    }
+
+                } else
+                {
+                    Console.WriteLine("Процедура не может быть осуществлена!");
+                }
+
+            }
+        }
+     static void Main(string[] args)
+        {
+            while (true)
+            {
+                Console.Write("Размерность = ");
+                int n = int.Parse(Console.ReadLine());
+                double[,] matrix = new double[n, n];
+                double[] b = new double[n];
+                Console.Write("Точность = ");
+                double E = double.Parse(Console.ReadLine());
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        Console.Write("A[{0}, {1}] =", i, j);
+                        matrix[i, j] = double.Parse(Console.ReadLine());
+                    }
+
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    Console.Write("b[{0}] = ", i);
+                    b[i] = double.Parse(Console.ReadLine());
+                }
+                Console.WriteLine("Расширенная матрица:");
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        Console.Write("{0:f2} ", matrix[i, j]);
+                    }
+                    Console.WriteLine("|{0:f2}", b[i]);
+                }
+                //Эквивалентные преобразования
+                for (int i = 0; i < n; i++)
+                {
+                    double p1 = matrix[i, i];
+                    if (Math.Abs(p1) <= E)
+                    {
+                        SwitchOfTheMAin(i, matrix, b);
+                        p1 = matrix[i, i];
+                    }
+                    for (int j = 0; j < n; j++)
+                    {
+                        matrix[i, j] /= p1;
+                    }
+                    b[i] /= p1;
+                    for (int k = i + 1; k < n; k++)
+                    {
+                        double Const = matrix[k, i]; //коэффициент - число
+                        for (int j = 0; j < n; j++)
+                        {
+                            matrix[k, j] -= Const * matrix[i, j];
+                        }
+                        b[k] -= Const * b[i];
+                    }
+                }
+                Console.WriteLine("Результат эквивалентных преобразований:");
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        Console.Write("{0:f2} ", matrix[i, j]);
+                    }
+                    Console.Write("|{0:f2}", b[i]);
+                    Console.WriteLine();
+                }
+                double[] XResults = new double[n];
+                XResults[n - 1] = b[n - 1];
+                int CountOfS = 1;
+                for (int i = n - 2; i >= 0; i--)
+                {
+                    int j = 1;
+                    double Difference = 0;
+                    while (j <= CountOfS)
+                    {
+                        Difference += matrix[i, i + j] * XResults[i + j];
+                        j++;
+                    }
+                    XResults[i] = b[i] - Difference;
+                    CountOfS++;
+                }
+                Console.WriteLine("Обратный порядок:");
+                for (int i = n - 1; i >= 0; i--)
+                {
+                    Console.Write("{0:f2} ", XResults[i]);
+                }
+                Console.WriteLine();
+                Console.WriteLine("Прямой порядок:");
+                foreach (double item in XResults)
+                {
+                    Console.Write("{0:f2} ", item);
+                }
+                Console.ReadLine();
+            }
+        }
+    }
+ }
